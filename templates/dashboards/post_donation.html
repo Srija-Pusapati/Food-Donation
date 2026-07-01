@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Post Donation - FoodShare{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 2rem auto;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+        <h2 class="heading" style="margin: 0;">Post a Food Donation</h2>
+        <a href="{% url 'donor_dashboard' %}" class="btn" style="border: 1px solid var(--border-color);"><i
+                class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Fill in the details below to list your leftover food. Make
+        sure the food is fresh and safe for consumption.</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="grid grid-2">
+            <div class="form-group">
+                <label class="form-label" for="{{ form.food_name.id_for_label }}">Food Description</label>
+                {{ form.food_name }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="{{ form.quantity.id_for_label }}">Quantity (e.g., servings/kg)</label>
+                {{ form.quantity }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="{{ form.location.id_for_label }}">Storage/Pickup Location</label>
+                {{ form.location }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="{{ form.expiry_time.id_for_label }}">Expiry Time</label>
+                {{ form.expiry_time }}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+            <label class="form-label" for="{{ form.food_image.id_for_label }}">Food Image (Optional but
+                recommended)</label>
+            {{ form.food_image }}
+        </div>
+
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Post
+                Donation</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

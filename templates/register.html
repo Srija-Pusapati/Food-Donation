@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Register - FoodShare{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 4rem auto;">
+    <h2 class="heading" style="text-align: center;">Join FoodShare</h2>
+    <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Sign up to help reduce food waste or
+        get the help you need.</p>
+
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <div style="color: var(--danger); font-size: 0.9rem; margin-top: 0.25rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+        <p>Already have an account? <a href="{% url 'login' %}">Log in here</a>.</p>
+    </div>
+</div>
+{% endblock %}

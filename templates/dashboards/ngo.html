@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}NGO Dashboard - FoodShare{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 1.5rem 2.5rem;">
+    <h1 class="heading" style="margin-bottom: 0.25rem;">NGO / Volunteer Dashboard</h1>
+    <p style="color: var(--text-muted);">Review available donations and manage pickups.</p>
+</div>
+
+<div class="grid grid-2">
+    <div>
+        <h2 class="heading" style="font-size: 1.5rem; margin-left: 0.5rem;">Available for Pickup</h2>
+        {% if available_donations %}
+        <div class="grid" style="grid-template-columns: 1fr;">
+            {% for donation in available_donations %}
+            {% include 'partials/_donation_card.html' with donation=donation %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="container">
+            <p style="color: var(--text-muted); text-align: center;">No donations available for pickup right now.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <h2 class="heading" style="font-size: 1.5rem; margin-left: 0.5rem;">My Active Deliveries</h2>
+        <div class="container" style="padding: 1.5rem;">
+            {% if my_deliveries %}
+            <ul style="display: grid; gap: 1rem;">
+                {% for delivery in my_deliveries %}
+                <li style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+                    <strong>{{ delivery.donation.food_name }}</strong>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        From: {{ delivery.donation.location }}<br>
+                        By: {{ delivery.donation.donor.username }}
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        {% if delivery.donation.status == 'accepted' %}
+                        <form action="{% url 'update_delivery' delivery.id 'picked_up' %}" method="POST"
+                            style="flex: 1;">
+                            {% csrf_token %}
+                            <button class="btn"
+                                style="background: var(--info); color: white; width: 100%; padding: 0.4rem;">Mark Picked
+                                Up</button>
+                        </form>
+                        {% elif delivery.donation.status == 'picked_up' %}
+                        <form action="{% url 'update_delivery' delivery.id 'delivered' %}" method="POST"
+                            style="flex: 1;">
+                            {% csrf_token %}
+                            <button class="btn btn-primary" style="width: 100%; padding: 0.4rem;">Mark
+                                Delivered</button>
+                        </form>
+                        {% else %}
+                        <span class="badge badge-delivered"><i class="fa-solid fa-check"></i> Completed</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p style="color: var(--text-muted); text-align: center;">You don't have any active deliveries.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

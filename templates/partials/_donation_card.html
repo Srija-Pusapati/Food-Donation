@@ -1,0 +1,79 @@
+<div class="card" style="position: relative;">
+    {% if donation.food_image %}
+    <img src="{{ donation.food_image.url }}" alt="{{ donation.food_name }}" class="card-img">
+    {% else %}
+    <div class="card-img"
+        style="background: var(--border-color); display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-image fa-3x" style="color: var(--text-muted)"></i>
+    </div>
+    {% endif %}
+
+    <span class="badge badge-{{ donation.status }}" style="position: absolute; top: 1rem; right: 1rem;">
+        {{ donation.get_status_display }}
+    </span>
+
+    <div class="card-body">
+        <h3 class="card-title">{{ donation.food_name }}</h3>
+        <p style="color: var(--text-muted); margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-box"></i> Quantity: {{ donation.quantity }}
+        </p>
+        <p style="color: var(--text-muted); margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-location-dot"></i> {{ donation.location }}
+        </p>
+        <p style="color: var(--danger); font-size: 0.9rem;">
+            <i class="fa-regular fa-clock"></i> Expires: {{ donation.expiry_time|date:"M d, Y h:i A" }}
+        </p>
+
+        {% if request.user.role == 'donor' and donation.requests.all %}
+        <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+            <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-color);">Requests:</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem;">
+                {% for req in donation.requests.all %}
+                <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--bg-light); border-radius: 4px;">
+                    <span style="font-size: 0.85rem; font-weight: 500;">{{ req.needy_person.username }}</span>
+                    {% if req.status == 'requested' %}
+                    <form action="{% url 'approve_request' req.id %}" method="POST" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">Accept</button>
+                    </form>
+                    {% else %}
+                    <span class="badge badge-{{ req.status }}" style="font-size: 0.75rem; padding: 0.15rem 0.4rem;">
+                        {{ req.get_status_display }}
+                    </span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if request.user.role == 'ngo' %}
+            {% for req in donation.requests.all %}
+                {% if req.status == 'approved' or req.status == 'delivered' %}
+                <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--info); background: rgba(52, 152, 219, 0.1); padding: 0.4rem 0.6rem; border-radius: 4px;">
+                    <i class="fa-solid fa-user"></i> Deliver to: <strong>{{ req.needy_person.username }}</strong>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
+            {% if request.user.role == 'ngo' and donation.status == 'pending' %}
+            <form action="{% url 'accept_donation' donation.id %}" method="POST" style="flex: 1;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.5rem;">Accept Pickup</button>
+            </form>
+            {% elif request.user.role == 'needy' and donation.status == 'pending' %}
+            <form action="{% url 'request_food' donation.id %}" method="POST" style="flex: 1;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.5rem;">Request Food</button>
+            </form>
+            {% elif request.user.role == 'donor' %}
+            <!-- Donor actions (e.g. edit/delete) can go here based on status -->
+            {% if donation.status == 'pending' %}
+            <a href="{% url 'delete_donation' donation.id %}" class="btn btn-danger" style="flex: 1; padding: 0.5rem; text-align: center;">Delete</a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>

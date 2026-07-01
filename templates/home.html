@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}FoodShare - End Food Waste{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div
+    style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: white; padding: 4rem 2rem; border-radius: var(--border-radius); text-align: center; margin-bottom: 3rem; box-shadow: var(--shadow-md);">
+    <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -1px;">Share Food. Spread Hope.
+    </h1>
+    <p style="font-size: 1.25rem; max-width: 600px; margin: 0 auto 2rem; opacity: 0.9;">Join our mission to reduce food
+        waste and help those in need. Whether you are a donor, volunteer, or someone seeking assistance, there's a place
+        for you here.</p>
+
+    {% if not user.is_authenticated %}
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'register' %}" class="btn"
+            style="background: white; color: var(--primary-dark); font-size: 1.1rem; padding: 0.8rem 2rem;">Get
+            Started</a>
+        <a href="{% url 'login' %}" class="btn"
+            style="border: 2px solid white; color: white; font-size: 1.1rem; padding: 0.8rem 2rem;">Log In</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Statistics -->
+<div class="grid grid-3" style="margin-bottom: 4rem;">
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary-color);">
+        <div class="card-body">
+            <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">
+                {{ stats.total_donations }}
+            </h3>
+            <p style="font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Total Donations</p>
+        </div>
+    </div>
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--secondary-color);">
+        <div class="card-body">
+            <h3 style="font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 0.5rem;">{{ stats.delivered }}
+            </h3>
+            <p style="font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Successful Deliveries</p>
+        </div>
+    </div>
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--info);">
+        <div class="card-body">
+            <h3 style="font-size: 2.5rem; color: var(--info); margin-bottom: 0.5rem;">{{ stats.requests }}</h3>
+            <p style="font-weight: 600; color: var(--text-muted); text-transform: uppercase;">People Helped</p>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Donations -->
+<div style="margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+        <div>
+            <h2 class="heading" style="margin-bottom: 0.5rem;">Recent Food Listings</h2>
+            <p style="color: var(--text-muted);">Freshly posted items available for pickup or request.</p>
+        </div>
+        {% if user.is_authenticated %}
+        {% if user.role == 'ngo' %}
+        <a href="{% url 'ngo_dashboard' %}" class="btn btn-primary">View All Available</a>
+        {% elif user.role == 'needy' %}
+        <a href="{% url 'needy_dashboard' %}" class="btn btn-primary">View All Available</a>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    {% if recent_donations %}
+    <div class="grid grid-3">
+        {% for donation in recent_donations %}
+        {% include 'partials/_donation_card.html' with donation=donation %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="container" style="text-align: center; padding: 3rem;">
+        <p style="color: var(--text-muted); font-size: 1.1rem;">No pending donations at the moment. Check back soon!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

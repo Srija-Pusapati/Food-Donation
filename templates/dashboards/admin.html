@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - FoodShare{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 1.5rem 2.5rem;">
+    <h1 class="heading" style="margin-bottom: 0.25rem;">System Administration</h1>
+    <p style="color: var(--text-muted);">Manage users and monitor system health.</p>
+</div>
+
+<div class="grid grid-3" style="margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <div class="card-body">
+            <i class="fa-solid fa-users fa-2x" style="color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+            <h3 style="font-size: 2rem; margin: 0;">{{ stats.total_users }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                Total Users</p>
+        </div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div class="card-body">
+            <i class="fa-solid fa-hand-holding-heart fa-2x"
+                style="color: var(--secondary-color); margin-bottom: 0.5rem;"></i>
+            <h3 style="font-size: 2rem; margin: 0;">{{ stats.total_donations }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                Total Donations</p>
+        </div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div class="card-body">
+            <i class="fa-solid fa-truck-fast fa-2x" style="color: var(--info); margin-bottom: 0.5rem;"></i>
+            <h3 style="font-size: 2rem; margin: 0;">{{ stats.food_delivered }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                Successful Deliveries</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="heading" style="font-size: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+        NGOs Pending Approval
+        <span class="badge badge-pending" style="font-size: 1rem;">{{ pending_ngos.count }}</span>
+    </h2>
+
+    {% if pending_ngos %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color); text-align: left;">
+                    <th style="padding: 1rem; color: var(--text-muted);">NGO Name</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Email</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Phone</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Address</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ngo in pending_ngos %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 1rem; font-weight: 500;">{{ ngo.username }}</td>
+                    <td style="padding: 1rem;">{{ ngo.email }}</td>
+                    <td style="padding: 1rem;">{{ ngo.phone_number }}</td>
+                    <td style="padding: 1rem;">{{ ngo.address|truncatewords:5 }}</td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem;">
+                        <form action="{% url 'approve_ngo' ngo.id %}" method="POST">
+                            {% csrf_token %}
+                            <button class="btn btn-primary"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Approve</button>
+                        </form>
+                        <form action="{% url 'reject_ngo' ngo.id %}" method="POST">
+                            {% csrf_token %}
+                            <button class="btn btn-danger"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2rem; background: var(--bg-light); border-radius: 8px;">
+        <p style="color: var(--text-muted); margin: 0;">All NGOs have been approved.</p>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 2rem;">
+        <a href="/admin/" target="_blank" class="btn" style="background: var(--text-main); color: white;">Open Full
+            Django Admin <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    </div>
+</div>
+{% endblock %}
